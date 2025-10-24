@@ -108,7 +108,7 @@ const getUseModel = async (
   tokenCount: number,
   config: any,
   lastUsage?: Usage | undefined
-) => {
+): Promise<string | string[]> => {
   const projectSpecificRouter = await getProjectSpecificRouter(req);
   const Router = projectSpecificRouter || config.Router;
 
@@ -221,6 +221,14 @@ export const router = async (req: any, _res: any, context: any) => {
     if (!model) {
       model = await getUseModel(req, tokenCount, config, lastMessageUsage);
     }
+
+    // 如果model是数组，随机选择一个
+    if (Array.isArray(model)) {
+      const randomIndex = Math.floor(Math.random() * model.length);
+      model = model[randomIndex];
+      req.log.info(`Randomly selected model from array: ${model}`);
+    }
+
     req.body.model = model;
   } catch (error: any) {
     req.log.error(`Error in router middleware: ${error.message}`);
