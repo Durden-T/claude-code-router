@@ -232,7 +232,14 @@ export const router = async (req: any, _res: any, context: any) => {
     req.body.model = model;
   } catch (error: any) {
     req.log.error(`Error in router middleware: ${error.message}`);
-    req.body.model = config.Router!.default;
+    let defaultModel = config.Router!.default;
+    // 如果defaultModel是数组，随机选择一个
+    if (Array.isArray(defaultModel)) {
+      const randomIndex = Math.floor(Math.random() * defaultModel.length);
+      defaultModel = defaultModel[randomIndex];
+      req.log.info(`Randomly selected default model from array: ${defaultModel}`);
+    }
+    req.body.model = defaultModel;
   }
   return;
 };
